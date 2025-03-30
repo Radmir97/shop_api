@@ -13,14 +13,61 @@
 
 ## Предварительные требования
 
-- Docker
-- Docker Compose
+- Python 3.8+
+- PostgreSQL
+- pip (менеджер пакетов Python)
 
-## Установка и запуск с помощью Docker
+## Установка и запуск
 
 1. Клонируйте репозиторий:
 ```bash
-git clone <repository-url>
+git clone https://github.com/Radmir97/shop_api
+cd shop-api
+```
+
+2. Создайте виртуальное окружение и активируйте его:
+```bash
+python -m venv venv
+source venv\Scripts\activate  # для Windows
+source venv/bin/activate     # для Linux/MacOS
+```
+
+3. Установите зависимости:
+```bash
+pip install -r requirements.txt
+```
+
+4. Создайте файл .env в корневой директории проекта:
+```bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/shop
+SECRET_KEY=your-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+5. Примените миграции:
+```bash
+# Создание миграции
+alembic revision --autogenerate -m "Initial migration"
+
+# Применение миграции
+alembic upgrade head
+```
+
+6. Запустите сервер:
+```bash
+uvicorn main:app --reload
+```
+
+Приложение будет доступно по адресу: http://127.0.0.1:8000/docs
+
+## Запуск с помощью Docker
+
+Если вы предпочитаете использовать Docker:
+
+1. Клонируйте репозиторий:
+```bash
+git clone https://github.com/Radmir97/shop_api
 cd shop-api
 ```
 
@@ -29,7 +76,13 @@ cd shop-api
 docker-compose up --build
 ```
 
-Приложение будет доступно по адресу: http://localhost:8000/docs
+При запуске Docker-контейнера автоматически:
+- Создаются все необходимые таблицы в базе данных
+- Применяются миграции
+- Создаются тестовые данные
+- Запускается приложение
+
+Приложение будет доступно по адресу: http://127.0.0.1:8000/docs
 
 ## Тестовые данные
 
@@ -72,10 +125,10 @@ docker-compose up --build
 
 ## Примеры использования
 
-### Регистрация пользователя (Происходит автоматически)
+### Регистрация пользователя
 
 ```bash
-curl -X POST "http://localhost:8000/api/register" \
+curl -X POST "http://127.0.0.1:8000/api/register" \
      -H "Content-Type: application/json" \
      -d '{"email": "user@example.com", "password": "password123"}'
 ```
@@ -83,7 +136,7 @@ curl -X POST "http://localhost:8000/api/register" \
 ### Получение токена
 
 ```bash
-curl -X POST "http://localhost:8000/api/token" \
+curl -X POST "http://127.0.0.1:8000/api/token" \
      -H "Content-Type: application/x-www-form-urlencoded" \
      -d "username=user@example.com&password=password123"
 ```
@@ -91,7 +144,7 @@ curl -X POST "http://localhost:8000/api/token" \
 ### Создание товара
 
 ```bash
-curl -X POST "http://localhost:8000/api/products" \
+curl -X POST "http://127.0.0.1:8000/api/products" \
      -H "Authorization: Bearer YOUR_TOKEN" \
      -H "Content-Type: application/json" \
      -d '{"name": "Product Name", "description": "Description", "price": 99.99, "stock": 10}'
